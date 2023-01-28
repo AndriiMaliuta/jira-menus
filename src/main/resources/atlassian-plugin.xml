@@ -27,4 +27,13 @@
            class="com.admal.menus.PropsMenu" key="user-position-prop-servlet">
     <url-pattern>/props-position-config</url-pattern>
   </servlet>
+
+  <web-item name="user-props-new-web-item" i18n-name-key="user-props-new-web-item.name"
+            key="user-props-new-web-item"
+            section="system.user.hover.links" weight="3">
+    <description key="user-props-new-web-item.description">new user custom menu</description>
+    <label key="user-props-new-web-item.label"/>
+    <link linkId="user-props-new-web-item-link">/plugins/servlet/props-position-config</link>
+  </web-item>
+
 </atlassian-plugin>

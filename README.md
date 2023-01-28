@@ -13,5 +13,8 @@ For example
 
 ### Endpoints
 
-Props config menu: {JIRA_URL}/plugins/servlet/props-position-config
+Props config menu: 
+```
+{JIRA_URL}/plugins/servlet/props-position-config
+```
 
