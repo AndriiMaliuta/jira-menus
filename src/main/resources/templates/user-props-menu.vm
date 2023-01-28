@@ -43,49 +43,58 @@
 
 <script type="text/javascript">
     const currentUser = "admin";
-    fetch(`/rest/api/2/user/properties?username=${currentUser}`).then(res => res.json()).then(res => {
-        res.keys.forEach(keyObj => {
-            fetch(`/rest/api/2/user/properties/${keyObj.key}?username=${currentUser}`).then(res => res.json()).then(res => {
-                const userDataTable = document.querySelector('table#user-custom-props-rest');
-                const userPropKey = res.key;
-                const userPropValue = res.value[`${keyObj.key}`];
+    const propsTable = document.querySelector('table#user-custom-props-rest');
 
-                const tr = document.createElement('tr');
-                const td1 = document.createElement('td');
-                td1.innerText = userPropKey;
-                const td2 = document.createElement('td');
-                td2.innerText = userPropValue;
+    function getPropsData() {
+        propsTable.querySelector('tbody').innerHTML = '';
 
-                const td3 = document.createElement('td');
-                td3.innerHTML = `<button class="aui-button aui-button-primary"
-                                         id="delete-new-prop-button-${userPropKey}">
+        fetch(`/rest/api/2/user/properties?username=${currentUser}`).then(res => res.json()).then(res => {
+            res.keys.forEach(keyObj => {
+                fetch(`/rest/api/2/user/properties/${keyObj.key}?username=${currentUser}`).then(res => res.json()).then(res => {
+                    const userDataTable = document.querySelector('table#user-custom-props-rest');
+                    const userPropKey = res.key;
+                    const userPropValue = res.value[`${keyObj.key}`];
+
+                    const tr = document.createElement('tr');
+                    const td1 = document.createElement('td');
+                    td1.innerText = userPropKey;
+                    const td2 = document.createElement('td');
+                    td2.innerText = userPropValue;
+
+                    const td3 = document.createElement('td');
+                    td3.innerHTML = `<button class="aui-button aui-button-primary"
+                                         id="delete-new-prop-button-${userPropKey}"
+                                         onclick="if (!(confirm('Are you sure you want to delete this property?'))) return false">
                                     Delete
                                  </button>`;
-                td3.dataset.propKey = userPropKey;
+                    td3.dataset.propKey = userPropKey;
 
-                tr.appendChild(td1);
-                tr.appendChild(td2);
-                tr.appendChild(td3);
+                    tr.appendChild(td1);
+                    tr.appendChild(td2);
+                    tr.appendChild(td3);
 
-                userDataTable.appendChild(tr);
+                    userDataTable.appendChild(tr);
 
-                // deleting
-                const deleteBtn = document.querySelector(`button#delete-new-prop-button-${userPropKey}`);
-                const deleteButtons = document.querySelectorAll(`button.aui-button`);
-                deleteButtons.forEach(btn => {
-                    btn.addEventListener('click', evt => {
-                        evt.preventDefault();
-                        let deletePropKey = btn.id.replace("delete-new-prop-button-", "");
-                        fetch(`/rest/api/2/user/properties/${deletePropKey}?username=${currentUser}`, {
-                            method: 'DELETE',
-                            headers: {'Content-Type': 'application/json'}
-                        });
-                    });
-                })
+                    // deleting
+                    const deleteBtn = document.querySelector(`button#delete-new-prop-button-${userPropKey}`);
+                    const deleteButtons = document.querySelectorAll(`button.aui-button`);
+                    deleteButtons.forEach(btn => {
+                        if (btn.innerText === 'Delete') {
+                            btn.addEventListener('click', evt => {
+                                evt.preventDefault();
+                                let deletePropKey = btn.id.replace("delete-new-prop-button-", "");
+                                fetch(`/rest/api/2/user/properties/${deletePropKey}?username=${currentUser}`, {
+                                    method: 'DELETE',
+                                    headers: {'Content-Type': 'application/json'}
+                                });
+                            });
+                        }
+                    })
 
+                });
             });
         });
-    });
+    }
 
     function initAddingProps() {
         const addBtn = document.querySelector('button#add-new-prop-button');
@@ -93,17 +102,18 @@
             evt.preventDefault();
             const newPropKey = document.querySelector('input#add-new-prop').value.trim();
             const propValue = document.querySelector('input#add-new-prop-value').value.trim();
-            fetch(`/rest/api/2/user/properties/${newPropObj.key}?username=${currentUser}`, {
+            fetch(`/rest/api/2/user/properties/${newPropKey}?username=${currentUser}`, {
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({[newPropKey]: propValue})
             });
+            getPropsData();
         });
+
     }
 
+    getPropsData();
     initAddingProps();
-
-
 
 </script>
 

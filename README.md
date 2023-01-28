@@ -10,3 +10,8 @@ For example
 
 
 ![Screenshot from 2023-01-28 13-53-53](https://user-images.githubusercontent.com/36703491/215265181-0e1cbf5d-61ae-4ce2-b51b-25bb43b4e72c.png)
+
+### Endpoints
+
+Props config menu: {JIRA_URL}/plugins/servlet/props-position-config
+
