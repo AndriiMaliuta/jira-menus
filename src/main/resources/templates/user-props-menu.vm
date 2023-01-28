@@ -87,12 +87,13 @@
                                     method: 'DELETE',
                                     headers: {'Content-Type': 'application/json'}
                                 });
+                                
+                                //getPropsData();
 
                             });
                         }
                     });
-                    propsTable.querySelector('tbody').innerHTML = '';
-                    getPropsData();
+                    
                 });
             });
         });
