@@ -73,7 +73,7 @@
                     tr.appendChild(td2);
                     tr.appendChild(td3);
 
-                    userDataTable.appendChild(tr);
+                    userDataTable.querySelector('tbody').appendChild(tr);
 
                     // deleting
                     const deleteBtn = document.querySelector(`button#delete-new-prop-button-${userPropKey}`);
@@ -87,10 +87,12 @@
                                     method: 'DELETE',
                                     headers: {'Content-Type': 'application/json'}
                                 });
+
                             });
                         }
-                    })
-
+                    });
+                    propsTable.querySelector('tbody').innerHTML = '';
+                    getPropsData();
                 });
             });
         });
