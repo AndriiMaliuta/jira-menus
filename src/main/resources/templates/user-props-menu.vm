@@ -14,6 +14,7 @@
             <tr>
                 <th>Field Name</th>
                 <th>User Property</th>
+                <th>Actions</th>
             </tr>
             </thead>
             <tbody></tbody>
@@ -30,7 +31,7 @@
                 <input type="text" id="add-new-prop" name="add-new-prom" required minlength="2">
             </div>
             <div class="field-group">
-                <label for="add-new-prop-value">Add vaue:</label>
+                <label for="add-new-prop-value">Add value:</label>
                 <input type="text" id="add-new-prop-value" name="add-new-prop-value" required minlength="2">
             </div>
             <div class="field-group">
@@ -48,81 +49,109 @@
                 const userDataTable = document.querySelector('table#user-custom-props-rest');
                 const userPropKey = res.key;
                 const userPropValue = res.value[`${keyObj.key}`];
+
                 const tr = document.createElement('tr');
                 const td1 = document.createElement('td');
                 td1.innerText = userPropKey;
                 const td2 = document.createElement('td');
                 td2.innerText = userPropValue;
+
+                const td3 = document.createElement('td');
+                td3.innerHTML = `<button class="aui-button aui-button-primary"
+                                         id="delete-new-prop-button-${userPropKey}">
+                                    Delete
+                                 </button>`;
+                td3.dataset.propKey = userPropKey;
+
                 tr.appendChild(td1);
                 tr.appendChild(td2);
+                tr.appendChild(td3);
+
                 userDataTable.appendChild(tr);
+
+                // deleting
+                const deleteBtn = document.querySelector(`button#delete-new-prop-button-${userPropKey}`);
+                const deleteButtons = document.querySelectorAll(`button.aui-button`);
+                deleteButtons.forEach(btn => {
+                    btn.addEventListener('click', evt => {
+                        evt.preventDefault();
+                        let deletePropKey = btn.id.replace("delete-new-prop-button-", "");
+                        fetch(`/rest/api/2/user/properties/${deletePropKey}?username=${currentUser}`, {
+                            method: 'DELETE',
+                            headers: {'Content-Type': 'application/json'}
+                        });
+                    });
+                })
+
             });
         });
     });
 
-    const addBtn = document.querySelector('button#add-new-prop-button');
-    const propKey = document.querySelector('input#add-new-prop').value.trim();
-    const propValue = document.querySelector('input#add-new-prop-value').value.trim();
-    addBtn.addEventListener('click', evt => {
-        evt.preventDefault();
-        const newProp = {
-            "key": propKey,
-            "value": {
-                propKey: propValue
-            }
-        }
-        fetch(`/rest/api/2/user/properties/${newProp}?username=${currentUser}`, {
-            method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(newProp)
+    function initAddingProps() {
+        const addBtn = document.querySelector('button#add-new-prop-button');
+        addBtn.addEventListener('click', evt => {
+            evt.preventDefault();
+            const newPropKey = document.querySelector('input#add-new-prop').value.trim();
+            const propValue = document.querySelector('input#add-new-prop-value').value.trim();
+            fetch(`/rest/api/2/user/properties/${newPropObj.key}?username=${currentUser}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({[newPropKey]: propValue})
+            });
         });
-    });
+    }
+
+    initAddingProps();
+
 
 
 </script>
 
 <script type="text/javascript">
-    AJS.RestfulTable({
-        el: jQuery("#user-custom-props"),
-        autoFocus: true,
-        resources: {
-            all: "rest/project/HSP/versions?expand=operations",
-            self: "rest/version"
-        },
-        deleteConfirmationCallback: function (model) {
-            AJS.$("#restful-table-model")[0].innerHTML = "<b>ID:</b> " + model.id + " <b>status:</b> " + model.status + " <b>description:</b> " + model.description;
-            AJS.dialog2("#delete-confirmation-dialog").show();
-            return new Promise(function (resolve, reject) {
-                AJS.$("#dialog-submit-button").click(function (e) {
-                    resolve();
-                    e.preventDefault();
-                    AJS.dialog2("#delete-confirmation-dialog").hide();
+    AJS.toInit(function() {
+        new AJS.RestfulTable({
+            el: jQuery("#project-config-versions-table"),
+            autoFocus: true,
+            resources: {
+                all: "rest/project/HSP/versions?expand=operations",
+                self: "rest/version"
+            },
+            deleteConfirmationCallback: function(model) {
+                AJS.$("#restful-table-model")[0].innerHTML = "<b>ID:</b> " + model.id + " <b>status:</b> " + model.status + " <b>description:</b> " + model.description;
+                AJS.dialog2("#delete-confirmation-dialog").show();
+                return new Promise(function(resolve, reject) {
+                    AJS.$("#dialog-submit-button").on('click', function (e) {
+                        resolve();
+                        e.preventDefault();
+                        AJS.dialog2("#delete-confirmation-dialog").hide();
+                    });
+                    AJS.$(".aui-dialog2-header-close, #warning-dialog-cancel").on('click', function (e) {
+                        reject();
+                        e.preventDefault();
+                        AJS.dialog2("#delete-confirmation-dialog").hide();
+                    });
                 });
-                AJS.$(".aui-dialog2-header-close, #warning-dialog-cancel").click(function (e) {
-                    reject();
-                    e.preventDefault();
-                    AJS.dialog2("#delete-confirmation-dialog").hide();
-                });
-            });
-        },
-        columns: [
-            {
-                id: "status",
-                header: ""
             },
-            {
-                id: "name",
-                header: "Version name"
-            },
-            {
-                id: "description",
-                header: "Description"
-            },
-            {
-                id: "releaseDate",
-                header: "Release date"
-            }
-        ]
+            columns: [
+                {
+                    id: "status",
+                    header: ""
+                },
+                {
+                    id: "name",
+                    header: "Version name"
+                },
+                {
+                    id: "description",
+                    header: "Description"
+                },
+                {
+                    id: "releaseDate",
+                    header: "Release date",
+                    inputAriaLabel: "Release date field"
+                }
+            ]
+        });
     });
 </script>
 </body>
