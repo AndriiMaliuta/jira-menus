@@ -1,24 +1,24 @@
+AJS.toInit(function () {
+    setPropInDialog();
+})
 
-AJS.init(function() {
+async function setPropInDialog() {
     document.querySelectorAll('a.user-hover').forEach(userMention => {
-
-        console.log(userMention)
         const currentUser = document.querySelector("meta[name='ajs-remote-user']").content;
+        userMention.addEventListener('mouseover', async evt => {
+            console.log(">>> inside :: addEventListener");
+            const resp = await fetch(`/rest/api/2/user/properties/department?username=${currentUser}`)
+            const res = await resp.json();
 
-        userMention.addEventListener('mouseover', evt => {
-            fetch(`/rest/api/2/user/properties/department?username=${currentUser}`)
-                .then(res => res.json())
-                .then(res => {
-                    const userPropKey = res.key;
-                    const userPropValue = res.value.department;
-                    let newProp = document.createElement('div');
-                    newProp.innerHTML = `<div>
+            const userPropKey = res.key;
+            const userPropValue = res.value.department;
+            let newProp = document.createElement('div');
+            newProp.innerHTML = `<div>
                             <p>Department: ${userPropValue}</p>
                         </div>`;
-                    console.log(">>>>>")
-                    console.log(newProp)
-                    userMention.querySelector('#user-hover-info').appendChild(newProp);
-                });
+            console.log(userMention)
+            console.log(userMention.querySelector('.user-hover-details'))
+            userMention.querySelector('.user-hover-details').parentElement.appendChild(newProp);
         });
     });
-})
+}
