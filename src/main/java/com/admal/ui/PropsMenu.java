@@ -1,15 +1,18 @@
-package com.admal.menus;
+package com.admal.ui;
 
 import com.atlassian.fugue.Option;
+import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.bc.user.UserPropertyService;
-import com.atlassian.jira.entity.property.EntityPropertyOptions;
-import com.atlassian.jira.entity.property.EntityPropertyService;
 import com.atlassian.jira.entity.property.EntityPropertyType;
-import com.atlassian.jira.event.user.property.UserPropertySetEvent;
+import com.atlassian.jira.issue.Issue;
+import com.atlassian.jira.issue.search.SearchException;
+import com.atlassian.jira.issue.search.SearchResults;
+import com.atlassian.jira.jql.builder.JqlQueryBuilder;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.UserPropertyManager;
-import com.atlassian.jira.util.SimpleErrorCollection;
+import com.atlassian.jira.web.bean.PagerFilter;
+import com.atlassian.query.Query;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.opensymphony.module.propertyset.PropertySet;
 
@@ -20,22 +23,22 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class PropsMenu extends HttpServlet {
     private final TemplateRenderer templateRenderer;
     private final JiraAuthenticationContext jiraAuthenticationContext;
     private final UserPropertyManager userPropertyManager;
     private final UserPropertyService userPropertyService;
+    private final SearchService searchService;
 
     public PropsMenu(TemplateRenderer templateRenderer, JiraAuthenticationContext jiraAuthenticationContext,
                      UserPropertyManager userPropertyManager,
-                     UserPropertyService userPropertyService) {
+                     UserPropertyService userPropertyService, SearchService searchService) {
         this.templateRenderer = templateRenderer;
         this.jiraAuthenticationContext = jiraAuthenticationContext;
         this.userPropertyManager = userPropertyManager;
         this.userPropertyService = userPropertyService;
+        this.searchService = searchService;
     }
 
     @Override
@@ -60,25 +63,23 @@ public class PropsMenu extends HttpServlet {
 
         userPropertyService.validateSetProperty(currentUser, currentUser.getId(), propertyInput);
 
+        // get properties
         PropertySet currentUserPs = userPropertyManager.getPropertySet(currentUser);
+        currentUserPs.setAsActualType("", "");
 
-//        userPropertyService.setProperty(
-//                currentUser,
-//                new EntityPropertyService.SetPropertyValidationResult(
-//                        new SimpleErrorCollection(),
-//                        Option.some(new EntityPropertyService.EntityPropertyInput(
-//                                "AAAA",
-//                                currentUser.getKey(),
-//                                currentUser.getId(),
-//                                EntityPropertyType.USER_PROPERTY.getDbEntityName())
-//                        )
-//                )
-//        );
 
         context.put("currentUserPs", currentUserPs);
 
-
         templateRenderer.render("/templates/user-props-menu.vm", context, resp.getWriter());
+
+    }
+
+    private void getUserProps(ApplicationUser user) throws SearchException {
+        Query query = JqlQueryBuilder.newBuilder()
+                .buildQuery();
+        SearchResults results = searchService.search(user, query, PagerFilter.getUnlimitedFilter());
+        List<Issue> issues = results.getIssues();
+
 
     }
 }

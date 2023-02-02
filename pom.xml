@@ -4,14 +4,16 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.admal</groupId>
     <artifactId>jira-menus</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.2</version>
     <organization>
         <name>Some Company</name>
         <url>http://www.example.com/</url>
     </organization>
+
     <name>jira-menus</name>
     <description>This is the com.admal:jira-menus plugin for Atlassian JIRA.</description>
     <packaging>atlassian-plugin</packaging>
+
     <dependencies>
         <dependency>
             <groupId>com.atlassian.jira</groupId>
@@ -145,6 +147,7 @@
             </plugin>
         </plugins>
     </build>
+
     <properties>
         <jira.version>7.13.0</jira.version>
         <amps.version>8.1.2</amps.version>
@@ -158,4 +161,5 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
+
 </project>

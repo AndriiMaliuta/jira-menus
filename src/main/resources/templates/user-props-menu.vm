@@ -42,7 +42,7 @@
 </div>
 
 <script type="text/javascript">
-    const currentUser = "admin";
+    const currentUser = document.querySelector("meta[name='ajs-remote-user']").content;
     const propsTable = document.querySelector('table#user-custom-props-rest');
 
     function getPropsData() {
@@ -87,13 +87,13 @@
                                     method: 'DELETE',
                                     headers: {'Content-Type': 'application/json'}
                                 });
-                                
+
                                 //getPropsData();
 
                             });
                         }
                     });
-                    
+
                 });
             });
         });
@@ -121,18 +121,19 @@
 </script>
 
 <script type="text/javascript">
-    AJS.toInit(function() {
+    AJS.toInit(function () {
         new AJS.RestfulTable({
-            el: jQuery("#project-config-versions-table"),
+            el: jQuery("#user-custom-props"),
             autoFocus: true,
             resources: {
-                all: "rest/project/HSP/versions?expand=operations",
+                all: "rest/api/2/user/properties?username=${currentUser}",
                 self: "rest/version"
             },
-            deleteConfirmationCallback: function(model) {
-                AJS.$("#restful-table-model")[0].innerHTML = "<b>ID:</b> " + model.id + " <b>status:</b> " + model.status + " <b>description:</b> " + model.description;
+            deleteConfirmationCallback: function (model) {
+                AJS.$("#restful-table-model")[0].innerHTML
+                        = "<b>ID:</b> " + model.id + " <b>status:</b> " + model.status + " <b>description:</b> " + model.description;
                 AJS.dialog2("#delete-confirmation-dialog").show();
-                return new Promise(function(resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     AJS.$("#dialog-submit-button").on('click', function (e) {
                         resolve();
                         e.preventDefault();
@@ -167,6 +168,24 @@
         });
     });
 </script>
+
+<script>
+    // AJS.$(function() {
+    //
+    //     console.log(">>>>>")
+    //     console.log(JIRA)
+    //
+    //     JIRA.bind(JIRA.Events.NEW_CONTENT_ADDED, function(e, context, reason) {
+    //         if (reason === JIRA.CONTENT_ADDED_REASON.pageLoad) {
+    //             var customFieldTypeKey = "customfield_10200"; // From atlassian-plugin.xml.
+    //             var defaultBlurTrigger = JIRA.Components.IssueEditor.InlineEditUtils.BlurTriggers.Default;
+    //             JIRA.Components.IssueEditor.InlineEditUtils.BlurTriggerMapping.custom[fieldType] = defaultBlurTrigger;
+    //         }
+    //     });
+    // });
+
+</script>
+
 </body>
 </html>
 
